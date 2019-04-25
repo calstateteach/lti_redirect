@@ -1,0 +1,22 @@
+{
+  "name": "redirect",
+  "version": "1.0.0",
+  "description": "CST Redirect LTI",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --ignore config/ server.js"
+  },
+  "author": "tps",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "body-parser": "^1.18.2",
+    "csv-parse": "^2.2.0",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "https": "^1.0.0",
+    "oauth-sign": "^0.8.2",
+    "pug": "^2.0.3"
+  }
+}

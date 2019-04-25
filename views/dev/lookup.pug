@@ -1,0 +1,253 @@
+doctype html
+html(lang='en')
+  head
+    title Redirect Lookup Data
+    STYLE.
+      TABLE.data, TABLE.data th, TABLE.data td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 3px;
+        font-size: small;
+      }
+
+  body
+    H1 Destination Lookup by Email and Assignment
+    TABLE(STYLE="border:none")
+      TR
+        TD(STYLE="text-align:right")
+          LABEL(FOR="email") Email:
+        TD
+          INPUT(TYPE="text" ID="email" VALUE="user@ourdomain.com" SIZE="40")
+      TR
+        TD(STYLE="text-align:right")
+          LABEL(FOR="assignmentName") Assignment name:
+        TD
+          INPUT(TYPE="text" ID="assignmentName" VALUE="m04ac16")
+      TR
+        TD
+        TD
+          BUTTON(ID="btnSubmit" ONCLICK="testLookup()") Lookup destination
+          | 
+          SPAN(ID="destination")
+    H1 Destination Lookup by Term Code and Assignment
+    TABLE(STYLE="border:none")
+      TR
+        TD(STYLE="text-align:right")
+          LABEL(FOR="termCode") Term Code:
+        TD
+          INPUT(TYPE="text" ID="termCode" VALUE="989")
+      TR
+        TD(STYLE="text-align:right") 
+          LABEL(FOR="assignmentName2") Assignment name:
+        TD
+          INPUT(TYPE="text" ID="assignmentName2" VALUE="m04ac16")
+      TR
+        TD
+        TD
+          BUTTON(ID="btnSubmit2" ONCLICK="testLookupByTermCode()") Lookup destination
+          | 
+          SPAN(ID="destination2")
+
+    H1 CAM User Search
+    TABLE(STYLE="border:none")
+      TR
+        TD(STYLE="text-align:right") 
+          LABEL(FOR="email3") CAM user email:
+        TD
+          INPUT(TYPE="text" ID="email3" VALUE="user@ourdomain.com" SIZE="40")
+      TR
+        TD
+        TD
+          BUTTON(ID="btnSubmit3" ONCLICK="testLookupCamUser()") Lookup CAM User
+          | 
+          SPAN(ID="destination3")
+          
+    H1 Mapping Data
+    P= "Mapping data loaded at " + timestamp.toLocaleString()
+    FORM(METHOD="GET" ACTION="lookup")
+      BUTTON(TYPE="SUBMIT") Reload mapping data
+      INPUT(TYPE="hidden" NAME="action" VALUE="load")
+    //- H2 CAM Student List
+    //- P= "CAM URL: " + camUrl
+    //- P= "Default destination: " + defaultDest
+    //- TABLE.data
+    //-   TR
+    //-     - var cols = Object.keys(students[0])
+    //-     each col in cols
+    //-       TH= col
+    //-     each student in students
+    //-       TR
+    //-         each col in cols
+    //-           TD= student[col]
+    //- P= 'Row count: ' + students.length
+    H2 Terms to Destination Groups
+    TABLE.data
+      TR
+        - var cols = Object.keys(terms[0])
+        each col in cols
+          TH= col
+        each term in terms
+          TR
+            each col in cols
+              TD= term[col]
+    P= 'Row count: ' + terms.length
+    H2 Assignments to Destinations
+    TABLE.data
+      TR
+        - var cols = Object.keys(assignments[0])
+        each col in cols
+          TH= col
+        each assignment in assignments
+          TR
+            each col in cols
+              TD= assignment[col]
+    P= 'Row count: ' + assignments.length
+
+    //- Stash data for browser scripts
+    DIV(ID="appLocation" STYLE="display:none")=APP_URL
+    script.
+
+      function testLookup() {
+        const email = document.getElementById('email').value;
+        const assignmentName = document.getElementById('assignmentName').value;
+        const appLocation = document.getElementById('appLocation').innerText;
+        const destSpan = document.getElementById('destination');
+        //- destSpan.innerText = email + ' ' + assignmentName + ' ' + appLocation;
+        const btn =  document.getElementById('btnSubmit');
+        // Paramater validation
+        if (!(email && assignmentName)) {
+          destSpan.innerText = 'Enter an email and assignment name.';
+          return false;
+        }
+
+        const ajaxEndpoint = appLocation + 'api/lookup/email/' + email + '/assignment/' + assignmentName;
+   
+        var httpRequest = new XMLHttpRequest();
+        if (!httpRequest) {
+          alert('Giving up :( Cannot create an XMLHTTP instance');
+          done();
+          return false;
+        }
+
+        btn.disabled = true;   // Don't let user do multiple lookups at once.
+        
+        httpRequest.onreadystatechange = lookupHandler;
+        httpRequest.open('GET', ajaxEndpoint, true);
+        httpRequest.send();
+
+        function lookupHandler() {
+          if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+              destSpan.innerText = httpRequest.responseText;
+              var submissions = JSON.parse(httpRequest.responseText);
+            } else {
+              destSpan.innerText = 'AJAX error status:' + httpRequest.status;
+            }
+            btn.disabled = false; // Let user try another test
+          } // end request done
+        } // end request handler
+      } // end function
+
+      function testLookupByTermCode() {
+        const termCode = document.getElementById('termCode').value;
+        const assignmentName = document.getElementById('assignmentName2').value;
+        const appLocation = document.getElementById('appLocation').innerText;
+        const destSpan = document.getElementById('destination2');
+        const btn =  document.getElementById('btnSubmit2');
+        // Paramater validation
+        if (!(termCode && assignmentName)) {
+          destSpan.innerText = 'Enter a term code and assignment name.';
+          return false;
+        }
+
+        const ajaxEndpoint = appLocation + 'api/lookup/term/' + termCode + '/assignment/' + assignmentName;
+   
+        var httpRequest = new XMLHttpRequest();
+        if (!httpRequest) {
+          alert('Giving up :( Cannot create an XMLHTTP instance');
+          done();
+          return false;
+        }
+
+        btn.disabled = true;   // Don't let user do multiple lookups at once.
+        
+        httpRequest.onreadystatechange = lookupHandler;
+        httpRequest.open('GET', ajaxEndpoint, true);
+        httpRequest.send();
+
+        function lookupHandler() {
+          if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+              destSpan.innerText = httpRequest.responseText;
+              var submissions = JSON.parse(httpRequest.responseText);
+            } else {
+              destSpan.innerText = 'AJAX error status:' + httpRequest.status;
+            }
+            btn.disabled = false; // Let user try another test
+          } // end request done
+        } // end request handler
+      } // end function
+
+
+      function testLookupCamUser() {
+        const appLocation = document.getElementById('appLocation').innerText;
+        const email = document.getElementById('email3').value;
+        const destSpan = document.getElementById('destination3');
+        const btn =  document.getElementById('btnSubmit3');
+
+        // Clear the last response
+        destSpan.innerText = '';
+
+        // Paramater validation
+        if (!(email)) {
+          destSpan.innerText = 'Enter a CAM user email.';
+          return false;
+        }
+
+        const ajaxEndpoint = appLocation + 'api/lookup/camuser/' + email;
+   
+        var httpRequest = new XMLHttpRequest();
+        if (!httpRequest) {
+          alert('Giving up :( Cannot create an XMLHTTP instance');
+          done();
+          return false;
+        }
+
+        btn.disabled = true;   // Don't let user do multiple lookups at once.
+        
+        httpRequest.onreadystatechange = lookupHandler;
+        httpRequest.open('GET', ajaxEndpoint, true);
+        httpRequest.send();
+
+        function lookupHandler() {
+          if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+              destSpan.innerText = httpRequest.responseText;
+            } else {
+              destSpan.innerText = 'AJAX error status:' + httpRequest.status;
+            }
+            btn.disabled = false; // Let user try another test
+          } // end request done
+        } // end request handler
+      } // end function
+
+
+      function initPage() {
+        // Implement [Enter] for submit form text fields.
+        const txtEmail = document.getElementById('email');
+        const txtAssName = document.getElementById('assignmentName');
+        const btnSubmit =  document.getElementById('btnSubmit');
+
+        function onEnterSubmit(event) {
+          if (event.keyCode === 13) {
+            btnSubmit.focus();
+            btnSubmit.click();
+          }
+        }
+
+        txtEmail.addEventListener('keyup', onEnterSubmit);
+        txtAssName.addEventListener('keyup', onEnterSubmit);
+      }
+
+      // Wait for DOM to load before tinkering with form behavior
+      document.addEventListener("DOMContentLoaded", initPage);
