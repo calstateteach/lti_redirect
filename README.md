@@ -8,7 +8,18 @@ The Web app uses the [Express](https://expressjs.com/) framework for [Node.js](h
 
 ### Configuration
 
-Configuration files are in the *config/* folder. Configuration strings retrieved from the runtime environment are specified in the *.env* file.
+Configuration files are in the *config/* folder. These are CSV files with target assignment URLs that are adjusted each term. Configuration strings retrieved from the runtime environment are specified in the *.env* file.
+
+### Web App Entry Points
+
+The LTI is expected to be entered by an LTI launch request using OAuth, which in production is a POST request from the Canvas app. The launch URL is the route */lti/params* in the root of the Web app. 
+
+There is also a */dev/lookup* route in the root of the Web app for a page that allows LTI admins to view & test the app configuration.
+
+The project's *routes* & *views* folders contain these subfolders:
+
+* *lti/* contains code executed for LTI users.
+* *dev/* contains code for the test page accessed by LTI admins & developers.
 
 ## Deployment
 
