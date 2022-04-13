@@ -10,7 +10,7 @@
   "author": "tps",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.0",
+    "async": "^3.2.2",
     "body-parser": "^1.18.2",
     "csv-parse": "^2.2.0",
     "dotenv": "^5.0.1",
